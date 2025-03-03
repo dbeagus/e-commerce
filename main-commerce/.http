@@ -1,5 +1,5 @@
 ### CONEXION ms-catalogo (5000) POST | REGISTRAR PRODUCTO
-POST http://localhost:5000/api/catalogo/
+POST http://main-commerce.localhost/api/catalogo/
 Content-Type: application/json
 
 {
@@ -9,11 +9,11 @@ Content-Type: application/json
 }
 
 ### CONEXION ms-catalogo (5000) GET | OBTENER PRODUCTO
-GET http://localhost:5000/api/catalogo/1
+GET http://main-commerce.localhost/api/catalogo/1
 Content-Type: application/json
 
 ### CONEXION ms-pagos (5000) POST | REGISTRAR PAGO
-POST http://localhost:5000/api/pagos/
+POST http://main-commerce.localhost/api/pagos/
 Content-Type: application/json
 
 {
@@ -23,11 +23,11 @@ Content-Type: application/json
 }
 
 ### CONEXION ms-pagos (5000) GET | LISTAR PAGOS
-GET http://localhost:5000/api/pagos/
+GET http://main-commerce.localhost/api/pagos/
 Content-Type: application/json
 
 ### CONEXION ms-compras (5000) POST | REGISTRAR COMPRA
-POST http://localhost:5000/api/compras/
+POST http://main-commerce.localhost/api/compras/
 Content-Type: application/json
 
 {
@@ -37,7 +37,7 @@ Content-Type: application/json
 }
 
 ### CONEXION ms-inventario (5000) POST | REGISTRAR TRANSACCION
-POST http://localhost:5000/api/inventario/
+POST http://main-commerce.localhost/api/inventario/
 Content-Type: application/json
 
 {
@@ -47,17 +47,17 @@ Content-Type: application/json
 }
 
 ### CONEXION ms-inventario (5000) GET | OBTENER STOCK
-GET http://localhost:5000/api/inventario/1
+GET http://main-commerce.localhost/api/inventario/1
 Content-Type: application/json
 
 ### CONEXION main-commerce (5000) POST | REGISTRAR COMPRA
-POST http://localhost:5000/api/compra/
+POST http://main-commerce.localhost/api/compra/
 Content-Type: application/json
 
 {
   "producto_id": 1,
-  "cantidad": 1,
-  "direccion_envio": "Calle 123",
+  "cantidad": 7,
+  "direccion_envio": "Calle pepito",
   "metodo": "tarjeta"
 }
 
@@ -71,7 +71,7 @@ Content-Type: application/json
 
 
 ### PRUEBA ms-catalogo (5001) POST | REGISTRAR PRODUCTO
-POST http://localhost:5001/api/catalogo/
+POST http://ms-catalogo.localhost/api/catalogo/
 Content-Type: application/json
 
 {
@@ -81,11 +81,11 @@ Content-Type: application/json
 }
 
 ### PRUEBA ms-catalogo (5001) GET | OBTENER PRODUCTO
-GET http://localhost:5001/api/catalogo/1
+GET http://ms-catalogo.localhost/api/catalogo/1
 Content-Type: application/json
 
 ### PRUEBA ms-compras (5002) POST | REGISTRAR COMPRA
-POST http://localhost:5002/api/compras/
+POST http://ms-compras.localhost/api/compras/
 Content-Type: application/json
 
 {
@@ -95,7 +95,7 @@ Content-Type: application/json
 }
 
 ### PRUEBA ms-pagos (5003) POST | REGISTRAR PAGO
-POST http://localhost:5003/api/pagos/
+POST http://ms-pagos.localhost/api/pagos/
 Content-Type: application/json
 
 {
@@ -105,11 +105,11 @@ Content-Type: application/json
 }
 
 ### PRUEBA ms-pagos (5003) GET | LISTAR PAGOS
-GET http://localhost:5003/api/pagos/
+GET http://ms-pagos.localhost/api/pagos/
 Content-Type: application/json
 
 ### PRUEBA ms-inventario (5004) POST |  REGISTRAR TRANSACCION
-POST http://localhost:5004/api/inventario/
+POST http://ms-inventarios.localhost/api/inventario/
 Content-Type: application/json
 
 {
@@ -119,5 +119,5 @@ Content-Type: application/json
 }
 
 ### PRUEBA ms-inventario (5004) GET | OBTENER STOCK
-GET http://localhost:5004/api/inventario/1
+GET http://ms-inventario.localhost/api/inventario/1
 Content-Type: application/json

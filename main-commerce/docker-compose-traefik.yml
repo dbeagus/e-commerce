@@ -1,0 +1,145 @@
+services:
+  traefik:
+    image: traefik:v2.5
+    container_name: traefik
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - mired
+
+  redis:
+    image: redis:6.2
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - mired
+    labels:
+      - "traefik.enable=false"
+
+  db:
+    image: postgres:14
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5433:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - mired
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d main_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    labels:
+      - "traefik.enable=false"
+
+  ms-catalogo:
+    build: ../ms-catalogo
+    image: ms-catalogo:1.0.0
+    container_name: ms-catalogo_v1
+    environment:
+      - FLASK_ENV=${FLASK_ENV}
+      - SQLALCHEMY_DATABASE_URI=${SQLALCHEMY_DATABASE_URI}
+    networks:
+      - mired
+    depends_on:
+      db:
+        condition: service_healthy
+    labels:
+      - "traefik.http.routers.ms-catalogo.rule=Host(`ms-catalogo.localhost`)"
+      - "traefik.http.services.ms-catalogo.loadbalancer.server.port=5000"
+      - "traefik.http.middlewares.ms-catalogo-cb.circuitbreaker.expression=LatencyAtQuantileMS(50.0) > 100"
+      - "traefik.http.routers.ms-catalogo.middlewares=ms-catalogo-cb"
+
+  ms-compras:
+    build: ../ms-compras
+    image: ms-compras:1.0.0
+    container_name: ms-compras_v1
+    environment:
+      - FLASK_ENV=${FLASK_ENV}
+      - SQLALCHEMY_DATABASE_URI=${SQLALCHEMY_DATABASE_URI}
+    networks:
+      - mired
+    depends_on:
+      db:
+        condition: service_healthy
+    labels:
+      - "traefik.http.routers.ms-compras.rule=Host(`ms-compras.localhost`)"
+      - "traefik.http.services.ms-compras.loadbalancer.server.port=5000"
+      - "traefik.http.middlewares.ms-compras-cb.circuitbreaker.expression=LatencyAtQuantileMS(50.0) > 100"
+      - "traefik.http.routers.ms-compras.middlewares=ms-compras-cb"
+
+  ms-pagos:
+    build: ../ms-pagos
+    image: ms-pagos:1.0.0
+    container_name: ms-pagos_v1
+    environment:
+      - FLASK_ENV=${FLASK_ENV}
+      - SQLALCHEMY_DATABASE_URI=${SQLALCHEMY_DATABASE_URI}
+    networks:
+      - mired
+    depends_on:
+      db:
+        condition: service_healthy
+    labels:
+      - "traefik.http.routers.ms-pagos.rule=Host(`ms-pagos.localhost`)"
+      - "traefik.http.services.ms-pagos.loadbalancer.server.port=5000"
+      - "traefik.http.middlewares.ms-pagos-cb.circuitbreaker.expression=LatencyAtQuantileMS(50.0) > 100"
+      - "traefik.http.routers.ms-pagos.middlewares=ms-pagos-cb"
+
+  ms-inventarios:
+    build: ../ms-inventarios
+    image: ms-inventarios:1.0.0
+    container_name: ms-inventario_v1
+    environment:
+      - FLASK_ENV=${FLASK_ENV}
+      - SQLALCHEMY_DATABASE_URI=${SQLALCHEMY_DATABASE_URI}
+    networks:
+      - mired
+    depends_on:
+      db:
+        condition: service_healthy
+    labels:
+      - "traefik.http.routers.ms-inventarios.rule=Host(`ms-inventarios.localhost`)"
+      - "traefik.http.services.ms-inventarios.loadbalancer.server.port=5000"
+      - "traefik.http.middlewares.ms-inventarios-cb.circuitbreaker.expression=LatencyAtQuantileMS(50.0) > 100"
+      - "traefik.http.routers.ms-inventarios.middlewares=ms-inventarios-cb"
+
+  main-commerce:
+    build: ../main-commerce
+    image: main-commerce:1.0.0
+    container_name: main-commerce_v1
+    environment:
+      - FLASK_ENV=${FLASK_ENV}
+      - SQLALCHEMY_DATABASE_URI=${SQLALCHEMY_DATABASE_URI}
+    networks:
+      - mired
+    depends_on:
+      - ms-catalogo
+      - ms-compras
+      - ms-pagos
+      - ms-inventarios
+      - redis
+    labels:
+      - "traefik.http.routers.main-commerce.rule=Host(`main-commerce.localhost`)"
+      - "traefik.http.services.main-commerce.loadbalancer.server.port=5000"
+
+volumes:
+  db_data:
+    driver: local
+
+networks:
+  mired:
+    driver: bridge
