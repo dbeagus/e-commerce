@@ -133,14 +133,15 @@ services:
     volumes:
       - ./k6:/k6
     working_dir: /k6
-    entrypoint: ["k6"]
-    command: ["run", "test.js"]
+    entrypoint: ["sh", "-c", "sleep 5 && k6 run test.js"]
     env_file:
       - .env
     networks:
       - mired
     depends_on:
       - main-commerce
+    labels:
+      - "traefik.enable=false"
       
 volumes:
   db_data:
